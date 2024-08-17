@@ -1,34 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="./assets/images/logo.png" type="image/x-icon">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="shortcut icon"
+      href="./assets/images/logo.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <title>Face Filter Pro</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <span class="header-left">Face Filter Pro</span>
-        <div class="header-right">
-            <div class="profile" style="display: none;">
-                <img src="./assets/images/logo.png" alt="Profile" height="30" width="30">
-                <span class="user-name">Musaraf Hossain</span>
-            </div>
-            <button type="button" class="auth-btn">
-                Sign In
-                <i class='bx bxl-google'></i>
-            </button>
-            <button type="button" class="auth-btn" style="display: none;">
-                Sign Out
-                <i class='bx bx-power-off'></i>
-            </button>
+      <span class="header-left">Face Filter Pro</span>
+      <div class="header-right">
+        <div class="profile" style="display: none">
+          <img
+            src="./assets/images/logo.png"
+            alt="Profile"
+            height="30"
+            width="30"
+          />
+          <span class="user-name">Musaraf Hossain</span>
         </div>
+        <button type="button" class="auth-btn" id="sign-in-btn" onclick="handleSigninClick()">
+          Sign In
+          <i class="bx bxl-google"></i>
+        </button>
+        <button type="button" class="auth-btn" style="display: none" id="sign-out-btn" onclick="handleSignoutClick()">
+          Sign Out
+          <i class="bx bx-power-off"></i>
+        </button>
+      </div>
     </header>
     <section>
-        <h1>This is My App.</h1>
+      <h1>This is My App.</h1>
     </section>
-    <script src="/script.js"></script>
-</body>
+
+    <!-- Include the Google API scripts -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Include your JavaScript files -->
+    <script src="./auth/gAuth.js" defer></script>
+    <script src="./script.js" defer></script>
+  </body>
 </html>
