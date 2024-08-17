@@ -1,0 +1,89 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body{
+    background-color: #f5f5f5;
+}
+
+header{
+    height: 80px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, 
+                rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+header .header-left{
+    font-size: 28px;
+    font-weight: 700;
+    margin-left: 30px;
+}
+
+header .header-right{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    vertical-align: middle;
+    gap: 20px;
+}
+
+header .header-right .profile{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+header .header-right .profile img{
+    border: 2px solid #ccc;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+header .header-right .profile span{
+    font-size: 18px;
+}
+
+header .auth-btn{
+    height: 40px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-right: 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, 
+                rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, 
+                rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    background-color: #00BFFF;
+    cursor: pointer;
+    transition: transform .3s ease-in-out;
+}
+
+header .auth-btn:hover{
+    transform: scale(1.05);
+}
+
+header .auth-btn i{
+    font-size: 24px;
+}
+
+section{
+    height: calc(100vh - 80px);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
