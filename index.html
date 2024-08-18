@@ -19,15 +19,6 @@
     <header>
       <span class="header-left">Face Filter Pro</span>
       <div class="header-right">
-        <div class="profile" style="display: none">
-          <img
-            src="./assets/images/logo.png"
-            alt="Profile"
-            height="30"
-            width="30"
-          />
-          <span class="user-name">Musaraf Hossain</span>
-        </div>
         <input
           type="file"
           id="image-selector"
@@ -52,16 +43,26 @@
           <span>Logout</span>
           <i class="bx bx-power-off"></i>
         </button>
+        <div class="profile" id="profile" style="display: none">
+          <span class="user-name" id="profile-name">User</span>
+          <img
+            id="profile-image"
+            alt="Profile"
+            height="30"
+            width="30"
+          />
+        </div>
       </div>
     </header>
 
     <section>
-      <div class="face-container">
+      <div class="face-container" id="face-container">
         <input
           type="file"
           id="face-selector"
           accept="image/*"
           style="display: none"
+          multiple
         />
         <div class="add-face-btn" id="add-face-btn" title="Add Face Image">
           +
@@ -69,35 +70,21 @@
       </div>
 
       <div class="image-tab">
-        <div class="tab-btn">
+        <div class="tab-btn" id="tab-btn">
           <input
             type="radio"
             id="all-images"
             name="tab"
             value="all-images"
             checked
-            onclick="showTab('all-images')"
+            onclick="showTab('all-images', 'all-images-tab')"
           />
           <label for="all-images">All Images</label>
-
-          <input
-            type="radio"
-            id="my-images"
-            name="tab"
-            value="my-images"
-            onclick="showTab('my-images')"
-          />
-          <label for="my-images">My Images</label>
         </div>
 
-        <div class="tab-container">
+        <div class="tab-container" id="tab-container">
           <!-- All Images tab content -->
           <div id="all-images-tab" class="tab-content">
-            <p>No images to show...</p>
-          </div>
-
-          <!-- My Images tab content -->
-          <div id="my-images-tab" class="tab-content" style="display: none">
             <p>No images to show...</p>
           </div>
         </div>
@@ -118,7 +105,8 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Include your JavaScript files -->
-    <script src="./auth/gAuth.js" defer></script>
+    <script src="./js/gAuth.js" defer></script>
+    <script src="./js/dirHandle.js" defer></script>
     <script src="./script.js" defer></script>
   </body>
 </html>

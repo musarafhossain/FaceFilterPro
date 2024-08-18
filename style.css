@@ -1,23 +1,33 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: sans-serif;
+    user-select: none;
 }
 
-body{
-    background-color: #f5f5f5;
+body {
+    background-color: #ffffff;
+    background-image: url('./assets/images/bg-image.jpg');
+    background-position: center bottom;
+    /* Centers the background image */
+    background-repeat: no-repeat;
+    /* Prevents the background image from repeating */
+    background-size: cover;
+    /* Scales the background image to cover the entire element */
 }
 
-header{
+
+header {
     height: 70px;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, 
-                rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+        rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     padding: 0 30px;
+    background-color: #f5f5f5;
 }
 
 header .header-left {
@@ -30,12 +40,12 @@ header .header-left {
         font-size: 24px;
     }
 
-    header{
+    header {
         padding: 0 10px;
     }
 }
 
-header .header-right{
+header .header-right {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,25 +54,36 @@ header .header-right{
     gap: 10px;
 }
 
-header .header-right .profile{
+header .header-right .profile {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
+    /*background-color: #c0c0c0;
+    border-radius: 5px;
+    padding: 5px 10px;*/
 }
 
-header .header-right .profile img{
+header .header-right .profile img {
     border: 2px solid #ccc;
     height: 50px;
     width: 50px;
     border-radius: 50%;
+    cursor: pointer;
 }
 
-header .header-right .profile span{
+header .header-right .profile span {
     font-size: 18px;
+    display: none;
 }
 
-header .auth-btn{
+@media (max-width: 768px) {
+    header .header-right .profile span {
+        display: none;
+    }
+}
+
+header .auth-btn {
     height: 40px;
     padding: 0 15px;
     display: flex;
@@ -82,21 +103,21 @@ header .auth-btn{
     font-family: cursive;
 }
 
-header .auth-btn:hover{
+header .auth-btn:hover {
     transform: scale(1.05);
 }
 
-header .auth-btn i{
+header .auth-btn i {
     font-size: 24px;
 }
 
 @media (max-width: 768px) {
-    header .auth-btn span{
+    header .auth-btn span {
         display: none;
     }
 }
 
-section{
+section {
     height: calc(100vh - 70px);
     padding: 10px;
     width: 100%;
@@ -105,17 +126,69 @@ section{
     gap: 2%;
 }
 
-section .face-container{
+section .face-container {
     width: 100%;
     height: fit-content;
-    border-radius: 11px;
-    padding: 15px;
-    border: 1px solid #ccc;
+    padding: 25px 15px;
+
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    overflow-x: auto; 
+    overflow-y: hidden;
+
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
 }
 
-section .face-container .add-face-btn{
-    height: 100%;
+section .face-container::-webkit-scrollbar {
+    height: 0; 
+}
+
+.face-img-style {
     max-height: 100px;
+    width: auto;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    flex-shrink: 0; 
+    position: relative;
+}
+
+.face-img-style img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.close-btn {
+    position: absolute;
+    right: 0;
+    top: 2;
+    font-size: 2em;
+    line-height: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.close-btn:hover {
+    color: rgb(0, 0, 0);
+}
+
+section .face-container .add-face-btn {
+    height: 100px;
     aspect-ratio: 1;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -124,16 +197,31 @@ section .face-container .add-face-btn{
     justify-content: center;
     align-items: center;
     font-size: 34px;
+    background-color: #D1D0CE; /* Background color to match design */
+    transition: background-color 0.3s ease-in-out; /* Smooth background color change on hover */
 }
 
-section .image-tab{
+section .face-container .add-face-btn:hover {
+    background-color: #C0C0C0; /* Change color on hover */
+}
+
+
+section .image-tab {
     width: 100%;
     height: 100%;
     border-radius: 11px;
     border: 1px solid #ccc;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-section .image-tab .tab-btn{
+section .image-tab .tab-btn {
     display: flex;
     justify-content: center;
     text-align: center;
@@ -142,7 +230,7 @@ section .image-tab .tab-btn{
     gap: 5px;
 }
 
-section .image-tab .tab-btn input{
+section .image-tab .tab-btn input {
     display: none;
 }
 
@@ -169,49 +257,55 @@ section .image-tab .tab-container {
 }
 
 .modal {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(1.1);
-  transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.1);
+    transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
 }
+
 .modal-content {
-  text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 1rem 1.5rem;
-  width: 24rem;
-  border-radius: 0.5rem;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 1rem 1.5rem;
+    width: 24rem;
+    border-radius: 0.5rem;
 }
-.modal-content p{
+
+.modal-content p {
     margin: 10px 0;
 }
-.bxs-error{
+
+.bxs-error {
     font-size: 4em;
     color: rgb(255, 66, 66);
 }
+
 .close-button {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-  font-size: 2em;
-  width: 1.5rem;
-  line-height: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 0.25rem;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 2em;
+    width: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 0.25rem;
 }
+
 .show-modal {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1.0);
-  transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1.0);
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
 }
+
