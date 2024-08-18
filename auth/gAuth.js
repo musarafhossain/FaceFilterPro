@@ -1,94 +1,63 @@
-// gAuth.js
+const CLIENT_ID = '936389827719-p29mt159u8qa0hkricvrecvtrcp9ofpl.apps.googleusercontent.com';
+const REDIRECT_URI = 'http://127.0.0.1:5500/';
+const SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const API_KEY = 'AIzaSyCnwIHjGfkPzfjKfBvE_2pGHWOiyYqN6yM';
 
-let CLIENT_ID;
-let API_KEY;
-let DISCOVERY_DOC;
-let SCOPES;
-let tokenClient;
-let gapiInited = false;
-let gisInited = false;
-
-async function loadConfig() {
-    try {
-        const response = await fetch('config.json');
-        const config = await response.json();
-        CLIENT_ID = config.CLIENT_ID;
-        API_KEY = config.API_KEY;
-        DISCOVERY_DOC = config.DISCOVERY_DOC;
-        SCOPES = config.SCOPES;
-        initializeGoogleServices();
-    } catch (error) {
-        console.error('Error loading config:', error);
-    }
+function getAuthUrl() {
+    const responseType = 'token';
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${responseType}&scope=${SCOPE}`;
+    return authUrl;
 }
 
-function initializeGoogleServices() {
-    if (typeof gapi !== 'undefined' && !gapiInited) {
-        gapi.load("client:auth2", initializeGapiClient);
-    }
-    if (typeof google !== 'undefined' && !gisInited) {
-        gisLoaded();
-    }
-}
+document.getElementById('sign-in-btn').addEventListener('click', () => {
+    signup();
+});
 
-async function initializeGapiClient() {
-    try {
-        await gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-    } catch (error) {
-        console.error('Error initializing GAPI client:', error);
-    }
-}
+document.getElementById('sign-out-btn').addEventListener('click', () => {
+    logout();
+});
 
-function gisLoaded() {
-    if (!CLIENT_ID) {
-        console.error('CLIENT_ID is not set');
-        return;
-    }
-
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: (resp) => {
-            if (resp.error !== undefined) {
-                throw resp;
-            }
-            authtoken = resp.access_token;
-            console.log("From Handle Auth :- ", authtoken);
-            document.getElementById("sign-in-btn").style.display = "none";
-            document.getElementById("sign-out-btn").style.display = "flex";
-        },
-    });
-    gisInited = true;
-
-    // Attach event handlers
-    document.getElementById("sign-in-btn").addEventListener("click", handleSigninClick);
-    document.getElementById("sign-out-btn").addEventListener("click", handleSignoutClick);
-}
-
-function handleSigninClick() {
-    if (!tokenClient) {
-        console.error('Token client is not initialized');
-        return;
-    }
-
-    if (gapi.client.getToken() === null) {
-        tokenClient.requestAccessToken({ prompt: "consent" });
+function initializeApp() {
+    if (!isLoggedIn()) {
+        login();
     } else {
-        tokenClient.requestAccessToken({ prompt: "" });
+        updateUIForLoggedInState();
     }
 }
 
-function handleSignoutClick() {
-    const token = gapi.client.getToken();
-    if (token !== null) {
-        google.accounts.oauth2.revoke(token.access_token);
-        gapi.client.setToken("");
-        authtoken = ""; // Clear the auth token
-        document.getElementById("sign-in-btn").style.display = "flex";
-        document.getElementById("sign-out-btn").style.display = "none";
+function updateUIForLoggedInState() {
+    document.getElementById('sign-in-btn').style.display = 'none';
+    document.getElementById('sign-out-btn').style.display = 'flex';
+}
+
+function getAccessToken() {
+    return sessionStorage.getItem('accessToken');
+}
+
+function isLoggedIn() {
+    return !!sessionStorage.getItem('accessToken');
+}
+
+function signup() {
+    const authUrl = getAuthUrl();
+    window.location.href = authUrl;
+}
+
+function login() {
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get('access_token');
+    if (token) {
+        sessionStorage.setItem('accessToken', token);
+        window.history.replaceState(null, '', REDIRECT_URI);
+        updateUIForLoggedInState();
     }
 }
+
+function logout() {
+    sessionStorage.removeItem('accessToken');
+    window.location.href = REDIRECT_URI;
+}
+
+// Initialize application on page load
+initializeApp();

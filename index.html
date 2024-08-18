@@ -28,24 +28,95 @@
           />
           <span class="user-name">Musaraf Hossain</span>
         </div>
-        <button type="button" class="auth-btn" id="sign-in-btn" onclick="handleSigninClick()">
-          Sign In
+        <input
+          type="file"
+          id="image-selector"
+          accept="image/*"
+          multiple
+          style="display: none"
+        />
+        <button type="button" class="auth-btn" id="upload-btn">
+          <span>Upload</span>
+          <i class="bx bx-upload"></i>
+        </button>
+        <button type="button" class="auth-btn" id="sign-in-btn">
+          <span>Login</span>
           <i class="bx bxl-google"></i>
         </button>
-        <button type="button" class="auth-btn" style="display: none" id="sign-out-btn" onclick="handleSignoutClick()">
-          Sign Out
+        <button
+          type="button"
+          class="auth-btn"
+          style="display: none"
+          id="sign-out-btn"
+        >
+          <span>Logout</span>
           <i class="bx bx-power-off"></i>
         </button>
       </div>
     </header>
+
     <section>
-      <h1>This is My App.</h1>
+      <div class="face-container">
+        <input
+          type="file"
+          id="face-selector"
+          accept="image/*"
+          style="display: none"
+        />
+        <div class="add-face-btn" id="add-face-btn" title="Add Face Image">
+          +
+        </div>
+      </div>
+
+      <div class="image-tab">
+        <div class="tab-btn">
+          <input
+            type="radio"
+            id="all-images"
+            name="tab"
+            value="all-images"
+            checked
+            onclick="showTab('all-images')"
+          />
+          <label for="all-images">All Images</label>
+
+          <input
+            type="radio"
+            id="my-images"
+            name="tab"
+            value="my-images"
+            onclick="showTab('my-images')"
+          />
+          <label for="my-images">My Images</label>
+        </div>
+
+        <div class="tab-container">
+          <!-- All Images tab content -->
+          <div id="all-images-tab" class="tab-content">
+            <p>No images to show...</p>
+          </div>
+
+          <!-- My Images tab content -->
+          <div id="my-images-tab" class="tab-content" style="display: none">
+            <p>No images to show...</p>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <div class="modal">
+      <div class="modal-content">
+        <span class="close-button">
+          <i class="bx bx-x"></i>
+        </span>
+        <i class="bx bxs-error"></i>
+        <p>Please login with google first</p>
+      </div>
+    </div>
 
     <!-- Include the Google API scripts -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <!-- Include your JavaScript files -->
     <script src="./auth/gAuth.js" defer></script>
     <script src="./script.js" defer></script>
