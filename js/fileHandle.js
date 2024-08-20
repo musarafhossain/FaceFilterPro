@@ -1,7 +1,7 @@
-var parentFolderId;
-var imageDataFolderId;
-var faceDataFolderId;
-var faceDataFileId;
+var parentFolderId = null;
+var imageDataFolderId = null;
+var faceDataFolderId = null;
+var faceDataFileId = null;
 var allImageIds = [];
 
 // Function to check if a folder exists
@@ -312,65 +312,4 @@ async function getImageById(fileId) {
         console.error('Error retrieving image by file ID:', error);
         throw error;
     }
-}
-
-async function initializeFolderId() {
-    try {
-        // Check for 'FaceFilterPro' folder
-        let parentFolderId = await checkFolderExist('FaceFilterPro');
-
-        if (parentFolderId) {
-            //console.log(`Parent Folder exists. ID: ${parentFolderId}`);
-        } else {
-            parentFolderId = await createFolder('FaceFilterPro');
-            //console.log(`Folder created successfully. ID: ${parentFolderId}`);
-        }
-
-        // Check for 'ImageData' folder inside the 'FaceFilterPro' folder
-        let imageDataFolderId = await checkFolderExist('ImageData', parentFolderId);
-
-        if (imageDataFolderId) {
-            //console.log(`Image Data Folder exists. ID: ${imageDataFolderId}`);
-        } else {
-            imageDataFolderId = await createFolder('ImageData', parentFolderId);
-            //console.log(`Folder created successfully. ID: ${imageDataFolderId}`);
-        }
-
-        // Check for 'FaceData' folder inside the 'FaceFilterPro' folder
-        let faceDataFolderId = await checkFolderExist('FaceData', parentFolderId);
-
-        if (faceDataFolderId) {
-            //console.log(`Face Data Folder exists. ID: ${faceDataFolderId}`);
-        } else {
-            faceDataFolderId = await createFolder('FaceData', parentFolderId);
-            //console.log(`Folder created successfully. ID: ${faceDataFolderId}`);
-        }
-
-        let faceDataFileId = await checkFileExist('faceData.json', faceDataFolderId);
-        if (faceDataFileId) {
-            //console.log(`Face Data Folder exists. ID: ${faceDataFolderId}`);
-        } else {
-            faceDataFileId = await createFile('faceData.json', faceDataFolderId);
-            //console.log(`File created successfully. ID: ${faceDataFolderId}`);
-        }
-
-        // Optionally return or use the folder IDs
-        return {
-            parentFolderId,
-            imageDataFolderId,
-            faceDataFolderId,
-            faceDataFileId
-        };
-    } catch (error) {
-        console.error('Error initializing folder IDs:', error);
-    }
-}
-
-async function loadImageIds(data) {
-    let newArr = [];
-    data.forEach(element => {
-        newArr = [...newArr, ...element.imagePaths];
-    });
-    newArr = [...new Set(newArr)];
-    return newArr;
 }

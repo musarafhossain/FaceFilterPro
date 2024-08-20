@@ -2,20 +2,25 @@ var faceImageCount = 0;
 var prevSelectedTabContainer, prevSelectedTabLabel;
 
 window.onload = async function () {
-    await loadFaceRecoModels()
-    // Initialize application on page load
     await initializeApp();
-    //await loadImageIds(data)
+    await loadFaceRecoModels()
+    document.getElementById('all-images-tab').style.display = 'grid';
     await addImagesToTab('all-images-tab', allImageIds);
+    await showTab('all-images', 'all-images-tab');
 }
 
 // Function to switch between tabs based on selected radio button
-function showTab(tabLabel, tabContainer) {
+async function showTab(tabLabel, tabContainer) {
     const currSelectedTabContainer = document.getElementById(tabContainer);
     const currSelectedTabLabel = document.querySelector(`label[for="${tabLabel}"]`);
 
     if (prevSelectedTabContainer) prevSelectedTabContainer.style.display = 'none';
-    currSelectedTabContainer.style.display = 'grid';
+    const hasPTag = currSelectedTabContainer.querySelector('p') !== null;
+    if (hasPTag) {
+        currSelectedTabContainer.style.display = 'block';
+    } else {
+        currSelectedTabContainer.style.display = 'grid';
+    }
 
     if (prevSelectedTabLabel) {
         prevSelectedTabLabel.style.backgroundColor = "#a3a3a3";
@@ -27,7 +32,6 @@ function showTab(tabLabel, tabContainer) {
     prevSelectedTabLabel = currSelectedTabLabel;
     prevSelectedTabContainer = currSelectedTabContainer;
 }
-showTab('all-images', 'all-images-tab');
 
 document.getElementById('upload-btn').addEventListener('click', function () {
     if (!isLoggedIn()) {
@@ -102,42 +106,6 @@ document.getElementById('image-selector').addEventListener('change', async funct
         }
     }
 });
-
-async function getBestMatch(labeledFaceDescriptors, descriptor) {
-    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-    const bestMatch = faceMatcher.findBestMatch(descriptor);
-    return bestMatch;
-}
-
-async function dataLabalize(data) {
-    // Convert and map data descriptors to labeled face descriptors
-    const labeledFaceDescriptors = await Promise.all(data.map(async (dt, index) => {
-        return new faceapi.LabeledFaceDescriptors(
-            `${index}`,
-            [new Float32Array(dt.descriptor)]
-        );
-    }));
-    return labeledFaceDescriptors;
-}
-
-// Function to load an image and extract face descriptor
-async function getFaceDescriptorFromImage(imagePath) {
-    // Load models
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-
-    // Load the image
-    const img = await faceapi.fetchImage(imagePath);
-
-    // Detect face descriptors
-    const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-
-    if (!detections) {
-        throw new Error('No face detected in the image.');
-    }
-
-    return detections.descriptor;
-}
 
 document.getElementById('add-face-btn').addEventListener('click', function () {
     if (!isLoggedIn()) {
@@ -244,6 +212,9 @@ async function addTabContainer(count, file) {
                 console.log(bestMatch.distance)
                 const myTabPara = document.createElement('p');
                 myTabPara.innerHTML = `Not matched with any image...`;
+                myTabPara.style.color = '#fff';
+                myTabPara.style.fontSize = '20px';
+                //myTab.style.display = 'block';
                 myTab.appendChild(myTabPara);
                 tabContainer.appendChild(myTab);
             } else {
@@ -376,31 +347,24 @@ async function uploadFile(file, parentFolderId = null) {
     return data.id; // Return the file ID after the upload
 }
 
-async function addImagesToTab(id, imgIds) {
-    const allImagesTab = document.getElementById(id);
+async function addImagesToTab(currTabId, imgIds) {
+    const currTab = document.getElementById(currTabId);
     try {
-
-        // Clear the container (optional, in case you want to remove old images)
-        allImagesTab.innerHTML = '';
-
+        if(imgIds.length > 0)
+            currTab.innerHTML = '';
         // Loop through each file ID and fetch the image
-        console.log(imgIds)
         for (const fileId of imgIds) {
             const image = await getImageById(fileId);
             const divElement = document.createElement('div');
             const imgElement = document.createElement('img');
             imgElement.src = image.thumbnailLink || image.webViewLink;
             imgElement.alt = image.name;
-
             imgElement.classList.add('image-class');
-
             // Append the image element to the container
             divElement.classList.add('gallery-item');
             divElement.appendChild(imgElement);
-            //allImagesTab.style.display = "grid";
-            allImagesTab.appendChild(divElement);
+            currTab.appendChild(divElement);
         }
-
     } catch (error) {
         console.error('Error appending images to HTML:', error);
     }

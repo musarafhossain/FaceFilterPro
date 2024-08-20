@@ -227,6 +227,7 @@ section .image-tab {
 section .image-tab .tab-btn {
     width: 100%;
     display: flex;
+    align-items: center;
     height: 15%;
     text-align: center;
     padding: 10px;
@@ -261,6 +262,8 @@ section .image-tab .tab-container {
     height: 85%;
     overflow-y: auto;
     overflow-x: hidden;
+    font-size: 20px;
+    color: #fff;
 }
 
 .active {
@@ -342,7 +345,6 @@ section .image-tab .tab-container {
   
   /* Grid container for tab content */
   .tab-content {
-    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Grid items will scale up/down with space */
     row-gap: 20px;
     column-gap: 10px;

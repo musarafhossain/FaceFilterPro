@@ -2,134 +2,182 @@ const CLIENT_ID = '936389827719-p29mt159u8qa0hkricvrecvtrcp9ofpl.apps.googleuser
 //const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
 const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
 const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.profile';
-
 const API_KEY = 'AIzaSyCnwIHjGfkPzfjKfBvE_2pGHWOiyYqN6yM';
 
-function getAuthUrl() {
+//function to redirect to google authentiation page
+async function goLoginPage() {
     const responseType = 'token';
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${responseType}&scope=${encodeURIComponent(SCOPE)}`;
-    return authUrl;
+    window.location.href = authUrl;
 }
 
-document.getElementById('sign-in-btn').addEventListener('click', () => {
-    signup();
-});
-
-document.getElementById('sign-out-btn').addEventListener('click', () => {
-    logout();
-});
-
+//function to initiate website when it's load
 async function initializeApp() {
-    if (!isLoggedIn()) {
-        login(); // Handle login if not already logged in
-    } else {
+    if (isLoggedIn()) {
         try {
-            // Initialize folder IDs
-            const folderIds = await initializeFolderId();
-            if (folderIds) {
-                parentFolderId = folderIds.parentFolderId;
-                imageDataFolderId = folderIds.imageDataFolderId;
-                faceDataFolderId = folderIds.faceDataFolderId;
-                faceDataFileId = folderIds.faceDataFileId;
-            }
-            console.log('All folders initialized:', folderIds);
-
-            // Update the UI for the logged-in state
-            updateUIForLoggedInState();
-
-            // Fetch face data using the faceDataFileId
-            const data = await getFileData(faceDataFileId);
-            if(data.length>0)
-                allImageIds = await loadImageIds(data);
-            console.log(allImageIds)
-
+            await initializeFolderId(); //Initialize folder IDs
+            await loadImageIds(); //Load existing all images
+            await updateUIForLoggedInState(); //update the ui after login
         } catch (error) {
             console.error('Error during app initialization:', error);
         }
+    } else {
+        await login();
     }
 }
 
-
-function updateUIForLoggedInState() {
-    document.getElementById('sign-in-btn').style.display = 'none';
-    document.getElementById('sign-out-btn').style.display = 'flex';
-    document.getElementById('profile').style.display = 'flex';
-
-    // Fetch and update user profile
-    fetchUserProfile();
+//function to check user already logged in or not
+function isLoggedIn() {
+    return !!sessionStorage.getItem('accessToken'); // !!(double exclamation mark) is used to convert a value to its boolean equivalent
 }
 
+//funcion to login user by google auth
+async function login() {
+    const hashWithhash = window.location.hash; //return the content after # in url (#access_token=1&&id=1)
+    const hash = hashWithhash.substring(1); //remove the # (access_token=1&&id=1)
+    const params = new URLSearchParams(hash); //handle convert paramobject key-value pair
+    const token = params.get('access_token'); //get the final data using key
+    if (token) {
+        sessionStorage.setItem('accessToken', token);
+        window.history.replaceState(null, '', REDIRECT_URI); //modify and clean the url
+        await initializeFolderId(); //Initialize folder IDs
+        await loadImageIds(); //Load existing all images
+        await updateUIForLoggedInState(); //update the ui after login
+    }
+}
+
+//function to update ui after login
+async function updateUIForLoggedInState() {
+    // Fetch and update user profile
+    const userInfo = await fetchUserProfileData();
+    if (userInfo) {
+        const profileName = userInfo.name || 'User';
+        const profileImageUrl = userInfo.picture || './assets/images/logo.png';
+        document.getElementById('sign-in-btn').style.display = 'none';
+        document.getElementById('sign-out-btn').style.display = 'flex';
+        document.getElementById('profile').style.display = 'flex';
+        document.getElementById('profile-name').textContent = profileName;
+        document.getElementById('profile-image').src = profileImageUrl;
+        document.getElementById('profile-image').title = profileName;
+    }
+}
+
+//function to get access token or auth token
 function getAccessToken() {
     return sessionStorage.getItem('accessToken');
 }
 
-function isLoggedIn() {
-    return !!sessionStorage.getItem('accessToken');
-}
-
-async function fetchUserProfile() {
-    const accessToken = sessionStorage.getItem('accessToken');
-
+//function for fetching user name and image
+async function fetchUserProfileData() {
+    const accessToken = getAccessToken();
     if (!accessToken) {
         console.error('No access token found.');
-        return;
+        return null;  // Return null if no access token is found
     }
-
     try {
         const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
-
         if (!response.ok) {
             const errorDetails = await response.json();
             throw new Error(`Error fetching user profile: ${response.statusText} - ${errorDetails.error.message}`);
         }
-
         const userInfo = await response.json();
-
-        // Update profile with fetched data
-        const profileName = userInfo.name || 'User';
-        const profileImageUrl = userInfo.picture || './assets/images/logo.png';
-
-        document.getElementById('profile-name').textContent = profileName;
-        document.getElementById('profile-image').src = profileImageUrl;
-        document.getElementById('profile-image').title = profileName;
-
+        return userInfo;
     } catch (error) {
         console.error(`Error fetching user profile: ${error.message}`);
-        // Optionally, set default values if fetching fails
-        document.getElementById('profile-name').textContent = 'User';
-        document.getElementById('profile-image').src = './assets/images/logo.png';
-        document.getElementById('profile-image').title = 'User';
+        return null;
     }
 }
 
-function signup() {
-    const authUrl = getAuthUrl();
-    window.location.href = authUrl;
-}
-
-async function login() {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
-    if (token) {
-        sessionStorage.setItem('accessToken', token);
-        window.history.replaceState(null, '', REDIRECT_URI);
-        updateUIForLoggedInState();
-        // Fetch face data using the faceDataFileId
-        const data = await getFileData(faceDataFileId);
-        allImageIds = await loadImageIds(data);
-        console.log(allImageIds)
-    }
-}
-
+//funcion to logout user
 function logout() {
     document.getElementById('profile').style.display = 'none';
     sessionStorage.removeItem('accessToken');
     window.location.href = REDIRECT_URI;
 }
 
+async function initializeFolderId() {
+    try {
+        // Check for folder existence
+        parentFolderId = await checkFolderExist('FaceFilterPro');
+        imageDataFolderId = await checkFolderExist('ImageData', parentFolderId);
+        faceDataFolderId = await checkFolderExist('FaceData', parentFolderId);
+        faceDataFileId = await checkFileExist('faceData.json', faceDataFolderId);
 
+        // If not exist then create
+        if (!parentFolderId) {
+            parentFolderId = await createFolder('FaceFilterPro');
+        }
+        if (!imageDataFolderId) {
+            imageDataFolderId = await createFolder('ImageData', parentFolderId);
+        }
+        if (!faceDataFolderId) {
+            faceDataFolderId = await createFolder('FaceData', parentFolderId);
+        }
+        if (!faceDataFileId) {
+            faceDataFileId = await createFile('faceData.json', faceDataFolderId);
+        }
+        // Store folder IDs in global variables
+        // These variables are already declared outside the function
+    } catch (error) {
+        console.error('Error initializing folder IDs:', error);
+    }
+}
+
+async function loadImageIds() {
+    const data = await getFileData(faceDataFileId);
+    if (data.length > 0) {
+        data.forEach(element => {
+            allImageIds = [...allImageIds, ...element.imagePaths];
+        });
+        allImageIds = [...new Set(allImageIds)];
+    }
+}
+
+/*
+async function checkAccessToken() {
+    const accessToken = getAccessToken(); // Get the current access token
+    if (!accessToken) {
+        console.error('No access token found.');
+        await goLoginPage();
+        return;
+    }
+    try {
+        const response = await fetch('https://example.com/api/check-token', { 
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (response.ok) {
+            // Token is valid
+            console.log('Access token is valid.');
+            return accessToken; // Return the valid access token
+        } else if (response.status === 401) {
+            // Token is expired or invalid
+            console.error('Access token is expired or invalid.');
+            await goLoginPage(); // Redirect to the login page if the token is invalid
+        } else {
+            // Handle other errors
+            const errorDetails = await response.json();
+            throw new Error(`Error checking access token: ${response.statusText} - ${errorDetails.message}`);
+        }
+    } catch (error) {
+        console.error(`Error checking access token: ${error.message}`);
+        await goLoginPage(); // Redirect to the login page if an error occurs
+    }
+}*/
+
+//signin button add event listerner
+document.getElementById('sign-in-btn').addEventListener('click', async () => {
+    await goLoginPage();
+});
+
+//signout button add event listener
+document.getElementById('sign-out-btn').addEventListener('click', () => {
+    logout();
+});
