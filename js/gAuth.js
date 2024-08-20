@@ -1,6 +1,6 @@
 const CLIENT_ID = '936389827719-p29mt159u8qa0hkricvrecvtrcp9ofpl.apps.googleusercontent.com';
-const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
-//const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
+//const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
+const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
 const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.profile';
 
 const API_KEY = 'AIzaSyCnwIHjGfkPzfjKfBvE_2pGHWOiyYqN6yM';
