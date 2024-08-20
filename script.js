@@ -66,7 +66,7 @@ document.getElementById('image-selector').addEventListener('change', async funct
 
                             //console.log(bestMatch)
 
-                            if (bestMatch.distance >= 0.45) {
+                            if (bestMatch.distance >= 0.50) {
                                 console.log("Face Not Exist... Added to DB");
                                 console.log(bestMatch.distance)
                                 data.push({
@@ -239,7 +239,7 @@ async function addTabContainer(count, file) {
 
             //console.log(bestMatch)
 
-            if (bestMatch.distance >= 0.45) {
+            if (bestMatch.distance >= 0.50) {
                 console.log("Face Not Exist..");
                 console.log(bestMatch.distance)
                 const myTabPara = document.createElement('p');
