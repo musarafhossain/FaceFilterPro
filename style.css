@@ -228,7 +228,7 @@ section .image-tab .tab-btn {
     width: 100%;
     display: flex;
     align-items: center;
-    height: 15%;
+    height: 65px;
     text-align: center;
     padding: 10px;
     border-bottom: 1px solid #a2a2a2;
@@ -259,7 +259,7 @@ section .image-tab .tab-btn label {
 
 section .image-tab .tab-container {
     padding: 10px;
-    height: 85%;
+    height: calc(100% - 65px);
     overflow-y: auto;
     overflow-x: hidden;
     font-size: 20px;

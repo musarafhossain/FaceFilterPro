@@ -5,10 +5,10 @@ window.onload = async function () {
     await initializeApp();
     await loadFaceRecoModels()
     document.getElementById('all-images-tab').style.display = 'grid';
-    await addImagesToTab('all-images-tab', allImageIds);
     await showTab('all-images', 'all-images-tab');
+    
 }
-
+await addImagesToTab('all-images-tab', allImageIds);
 // Function to switch between tabs based on selected radio button
 async function showTab(tabLabel, tabContainer) {
     const currSelectedTabContainer = document.getElementById(tabContainer);
