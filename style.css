@@ -4,9 +4,11 @@
     box-sizing: border-box;
     font-family: sans-serif;
     user-select: none;
+    overflow: hidden;
 }
 
 body {
+    height: 100vh;
     background-color: #ffffff;
     background-image: url('./assets/images/bg-image.jpg');
     background-position: center bottom;
@@ -128,7 +130,6 @@ section {
 
 section .face-container {
     width: 100%;
-    height: fit-content;
     padding: 25px 15px;
 
     background: rgba(255, 255, 255, 0.15);
@@ -199,6 +200,7 @@ section .face-container .add-face-btn {
     font-size: 34px;
     background-color: #D1D0CE; /* Background color to match design */
     transition: background-color 0.3s ease-in-out; /* Smooth background color change on hover */
+    flex-shrink: 0;
 }
 
 section .face-container .add-face-btn:hover {
@@ -219,15 +221,19 @@ section .image-tab {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.18);
+    
 }
 
 section .image-tab .tab-btn {
+    width: 100%;
     display: flex;
-    justify-content: center;
+    height: 15%;
     text-align: center;
-    padding: 10px 0;
+    padding: 10px;
     border-bottom: 1px solid #a2a2a2;
-    gap: 5px;
+    gap: 15px;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 section .image-tab .tab-btn input {
@@ -240,15 +246,21 @@ section .image-tab .tab-btn label {
     justify-content: center;
     height: 40px;
     width: 100px;
+    min-width: fit-content;
+    text-wrap: nowrap;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 700;
-    padding: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 5px 10px;
+    background-color: #a3a3a3;
+    transition: all 0.3s ease, color 0.3s ease;
 }
 
 section .image-tab .tab-container {
     padding: 10px;
+    height: 85%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .active {
@@ -309,3 +321,33 @@ section .image-tab .tab-container {
     transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
 }
 
+/* Fixed size for images */
+.image-class {
+    width: 140px; /* Fixed width */
+    height: 200px; /* Fixed height */
+    display: block; /* Remove extra space below images */
+    border-radius: 8px; /* Rounded corners for grid items */
+    object-fit: cover; /* Cover the grid item without stretching */
+  }
+  
+  /* Style for grid items */
+  .gallery-item {
+    position: relative; /* Allows overlay positioning */
+    overflow: hidden; /* Ensures image fits within grid item */
+    background-color: transparent; /* Background color */
+    display: flex; /* Center image horizontally and vertically */
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Grid container for tab content */
+  .tab-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Grid items will scale up/down with space */
+    row-gap: 20px;
+    column-gap: 10px;
+    justify-content: center; /* Center the grid items horizontally */
+    align-content: start; /* Align items to the start vertically */
+    padding: 10px; /* Padding around the grid */
+    box-sizing: border-box;
+  }

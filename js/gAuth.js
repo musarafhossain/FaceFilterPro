@@ -1,7 +1,7 @@
 const CLIENT_ID = '936389827719-p29mt159u8qa0hkricvrecvtrcp9ofpl.apps.googleusercontent.com';
-//const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
-const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
-const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile';
+const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
+//const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
+const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.profile';
 
 const API_KEY = 'AIzaSyCnwIHjGfkPzfjKfBvE_2pGHWOiyYqN6yM';
 
@@ -19,13 +19,36 @@ document.getElementById('sign-out-btn').addEventListener('click', () => {
     logout();
 });
 
-function initializeApp() {
+async function initializeApp() {
     if (!isLoggedIn()) {
-        login();
+        login(); // Handle login if not already logged in
     } else {
-        updateUIForLoggedInState();
+        try {
+            // Initialize folder IDs
+            const folderIds = await initializeFolderId();
+            if (folderIds) {
+                parentFolderId = folderIds.parentFolderId;
+                imageDataFolderId = folderIds.imageDataFolderId;
+                faceDataFolderId = folderIds.faceDataFolderId;
+                faceDataFileId = folderIds.faceDataFileId;
+            }
+            console.log('All folders initialized:', folderIds);
+
+            // Update the UI for the logged-in state
+            updateUIForLoggedInState();
+
+            // Fetch face data using the faceDataFileId
+            const data = await getFileData(faceDataFileId);
+            if(data.length>0)
+                allImageIds = await loadImageIds(data);
+            console.log(allImageIds)
+
+        } catch (error) {
+            console.error('Error during app initialization:', error);
+        }
     }
 }
+
 
 function updateUIForLoggedInState() {
     document.getElementById('sign-in-btn').style.display = 'none';
@@ -88,7 +111,7 @@ function signup() {
     window.location.href = authUrl;
 }
 
-function login() {
+async function login() {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const token = params.get('access_token');
@@ -96,6 +119,10 @@ function login() {
         sessionStorage.setItem('accessToken', token);
         window.history.replaceState(null, '', REDIRECT_URI);
         updateUIForLoggedInState();
+        // Fetch face data using the faceDataFileId
+        const data = await getFileData(faceDataFileId);
+        allImageIds = await loadImageIds(data);
+        console.log(allImageIds)
     }
 }
 
@@ -105,5 +132,4 @@ function logout() {
     window.location.href = REDIRECT_URI;
 }
 
-// Initialize application on page load
-initializeApp();
+
