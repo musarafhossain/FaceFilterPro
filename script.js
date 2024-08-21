@@ -144,6 +144,10 @@ document.getElementById('add-face-btn').addEventListener('click', async function
         return;
     }
     await refreshAccessToken();
+    if(!allImageIds.length>0){
+        toggleModal('up-modal')
+        return
+    }
     document.getElementById('face-selector').click();
 });
 
