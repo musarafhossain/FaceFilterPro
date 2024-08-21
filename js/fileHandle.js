@@ -313,3 +313,45 @@ async function getImageById(fileId) {
         throw error;
     }
 }
+
+// Function to upload a file to Google Drive
+async function uploadFile(file, parentFolderId = null) {
+    if (!file) {
+        console.error("No file selected.");
+        return;
+    }
+
+    const metadata = {
+        name: file.name,
+        mimeType: file.type,
+        ...(parentFolderId && { parents: [parentFolderId] })  // Include the parent folder ID if provided
+    };
+
+    const formData = new FormData();
+    formData.append(
+        "metadata",
+        new Blob([JSON.stringify(metadata)], { type: "application/json" })
+    );
+    formData.append("file", file);
+
+    const response = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`, // Use the token from sessionStorage
+            },
+            body: formData,
+        }
+    );
+
+    if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(`Network response was not ok. Status: ${response.status}. Text: ${JSON.stringify(errorResponse)}`);
+    }
+
+    const data = await response.json();
+    console.log("File uploaded successfully:", data);
+
+    return data.id; // Return the file ID after the upload
+}

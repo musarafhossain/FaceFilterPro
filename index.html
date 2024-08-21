@@ -90,13 +90,31 @@
       </div>
     </section>
 
-    <div class="modal">
-      <div class="modal-content">
-        <span class="close-button">
+    <div class="modal" id="err-modal">
+      <div class="modal-content" id="err-modal-content">
+        <span class="close-button" id="err-modal-close-button" onclick="toggleModal('err-modal')">
           <i class="bx bx-x"></i>
         </span>
         <i class="bx bxs-error"></i>
         <p>Please login with google first</p>
+      </div>
+    </div>
+
+    <div class="modal" id="progress-modal">
+      <div class="modal-content" id="progress-modal-content">
+        <div class="loader-parent">
+          <div class="loader"></div>
+        </div>
+        <p>Image Loading... <span id="progress-status" style="font-size: 22px; font-weight: 400;">(0/0)</span></p>
+      </div>
+    </div>
+
+    <div class="modal" id="loading-modal">
+      <div class="modal-content" id="loading-modal-content">
+        <div class="loader-parent">
+          <div class="loader"></div>
+        </div>
+        <p>Loading...</p>
       </div>
     </div>
 
