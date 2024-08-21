@@ -234,8 +234,10 @@ section .image-tab .tab-btn {
     padding: 10px;
     border-bottom: 1px solid #a2a2a2;
     gap: 15px;
-    overflow-x: auto;
+    overflow-x: visible;
     overflow-y: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 section .image-tab .tab-btn input {
@@ -257,6 +259,69 @@ section .image-tab .tab-btn label {
     background-color: #a3a3a3;
     transition: all 0.3s ease, color 0.3s ease;
 }
+
+section .image-tab .tab-btn .tooltip-btn-label {
+    position: absolute;
+    width: auto;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 10px;
+    font-size: 22px;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #a2a2a2;
+    border-radius: 50%;
+    transition: background-color .3s ease-in-out;
+}
+
+section .image-tab .tab-btn .tooltip-btn-label:hover {
+    background-color: #fff;
+}
+
+section .image-tab .tab-container .tooltip{
+    position: absolute;
+    width: 130px;
+    top: 60px;
+    right: 5px;
+    border-radius: 11px;
+    background-color: #fff;
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    z-index: 1;
+    display: none;
+}
+
+.tab-container #tooltip-btn:checked ~ .tooltip{
+    opacity: 1;
+    display: block;
+}
+
+.tooltip button{
+    width: 100%;
+    height: 40px;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+    gap: 5px;
+    transition: background-color .3s ease-in-out;
+}
+
+.tooltip button:hover{
+    background-color: cornflowerblue;
+}
+
+.tooltip button i{
+    font-size: 22px;
+}
+
 
 section .image-tab .tab-container {
     padding: 10px;

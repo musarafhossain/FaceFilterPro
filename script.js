@@ -1,5 +1,6 @@
 var faceImageCount = 0;
 var prevSelectedTabContainer, prevSelectedTabLabel;
+var currTab;
 var err_modal = document.getElementById("err-modal");
 
 window.onload = async function () {
@@ -19,6 +20,7 @@ window.onload = async function () {
 
         await showTab('all-images', 'all-images-tab'); // Show the 'all-images' tab
         console.log("Display All Images...");
+        //console.log(await getFileData(faceDataFileId));
 
     } catch (error) {
         console.error("An error occurred during initialization:", error);
@@ -30,6 +32,7 @@ window.onload = async function () {
 
 // Function to switch between tabs based on selected radio button
 async function showTab(tabLabel, tabContainer) {
+    currTab = tabContainer;
     const currSelectedTabContainer = document.getElementById(tabContainer);
     const currSelectedTabLabel = document.querySelector(`label[for="${tabLabel}"]`);
 
@@ -52,11 +55,12 @@ async function showTab(tabLabel, tabContainer) {
     prevSelectedTabContainer = currSelectedTabContainer;
 }
 
-document.getElementById('upload-btn').addEventListener('click', function () {
+document.getElementById('upload-btn').addEventListener('click', async function () {
     if (!isLoggedIn()) {
         toggleModal('err-modal');
         return;
     }
+    await refreshAccessToken();
     document.getElementById('image-selector').click();
 });
 
@@ -134,11 +138,12 @@ document.getElementById('image-selector').addEventListener('change', async funct
     }
 });
 
-document.getElementById('add-face-btn').addEventListener('click', function () {
+document.getElementById('add-face-btn').addEventListener('click', async function () {
     if (!isLoggedIn()) {
         toggleModal('err-modal');
         return;
     }
+    await refreshAccessToken();
     document.getElementById('face-selector').click();
 });
 
@@ -238,6 +243,7 @@ async function addTabContainer(count, file) {
                 const matchedData = data[bestMatch.label];
                 console.log(matchedData?.imagePaths);
                 tabContainer.appendChild(myTab);
+                faceImageIds[`my-tab-${count}`] = matchedData?.imagePaths;
                 addImagesToTab(`my-tab-${count}`, matchedData?.imagePaths)
             }
         } else {
@@ -337,8 +343,9 @@ function toggleModal(modal) {
 }
 
 function windowOnClick(event) {
+    // Check if the click target is the error modal
     if (event.target === err_modal) {
-        toggleModal();
+        toggleModal('error-modal'); // Pass the specific modal ID if needed
     }
 }
 

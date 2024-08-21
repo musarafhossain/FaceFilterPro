@@ -3,9 +3,11 @@ var imageDataFolderId = null;
 var faceDataFolderId = null;
 var faceDataFileId = null;
 var allImageIds = [];
+var faceImageIds = {};
 
 // Function to check if a folder exists
 async function checkFolderExist(folderName, parentId = null) {
+    await refreshAccessToken();
     const url = 'https://www.googleapis.com/drive/v3/files';
 
     // Set up the headers with the access token
@@ -48,6 +50,7 @@ async function checkFolderExist(folderName, parentId = null) {
 }
 
 async function createFolder(folderName, parentId = null) {
+    await refreshAccessToken();
     const accessToken = sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
@@ -95,6 +98,7 @@ async function createFolder(folderName, parentId = null) {
 }
 
 async function checkFileExist(fileName, folderId = null) {
+    await refreshAccessToken();
     const url = 'https://www.googleapis.com/drive/v3/files';
 
     // Set up the headers with the access token
@@ -137,6 +141,7 @@ async function checkFileExist(fileName, folderId = null) {
 }
 
 async function createFile(fileName, parentId = null) {
+    await refreshAccessToken();
     const accessToken = sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
@@ -183,6 +188,7 @@ async function createFile(fileName, parentId = null) {
 
 // Function to get the content of a file from Google Drive
 async function getFileData(id) {
+    await refreshAccessToken();
     try {
         const response = await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, {
             headers: {
@@ -215,6 +221,7 @@ async function getFileData(id) {
 
 // Function to update the content of a file on Google Drive
 async function updateFile(fileId, content) {
+    await refreshAccessToken();
     const url = `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`;
     const accessToken = getAccessToken();
 
@@ -248,6 +255,7 @@ async function updateFile(fileId, content) {
 }
 
 async function getImagesFromFolder(folderId) {
+    await refreshAccessToken();
     // Get the access token from sessionStorage
     const accessToken = sessionStorage.getItem('accessToken');
 
@@ -283,6 +291,7 @@ async function getImagesFromFolder(folderId) {
 }
 
 async function getImageById(fileId) {
+    await refreshAccessToken();
     const accessToken = sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
@@ -316,6 +325,7 @@ async function getImageById(fileId) {
 
 // Function to upload a file to Google Drive
 async function uploadFile(file, parentFolderId = null) {
+    await refreshAccessToken();
     if (!file) {
         console.error("No file selected.");
         return;
@@ -354,4 +364,143 @@ async function uploadFile(file, parentFolderId = null) {
     console.log("File uploaded successfully:", data);
 
     return data.id; // Return the file ID after the upload
+}
+
+async function deleteImages() {
+    if (!isLoggedIn()) {
+        toggleModal('err-modal');
+        return;
+    }
+    await refreshAccessToken();
+    let fileIds = [];
+    if (currTab === 'all-images-tab') {
+        fileIds = allImageIds; // Replace with your file IDs
+    } else {
+        for (var key in faceImageIds) {
+            if (currTab === key) {
+                fileIds = faceImageIds[key];
+            }
+        }
+    }
+    if (!fileIds.length > 0) {
+        toggleModal('down-del-modal');
+        return
+    }
+
+    let data = await getFileData(faceDataFileId);
+
+    console.log("Image Downoading Start")
+    const accessToken = getAccessToken();
+    const apiUrl = 'https://www.googleapis.com/drive/v3/files/';
+    try {
+        let progress = 0;
+        toggleModal('progress-modal');
+        for (const imageId of fileIds) {
+            progress++;
+            document.getElementById('progress-status').innerHTML = `(${progress}/${fileIds.length})`;
+            const response = await fetch(`${apiUrl}${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete image with ID ${imageId}: ${response.statusText}`);
+            }
+            let newData = await deleteIdFromData(imageId, data)
+            await updateFile(faceDataFileId, newData);
+            console.log(`Image with ID ${imageId} deleted successfully.`);
+        }
+    } catch (error) {
+        console.error(error);
+    } finally {
+        toggleModal('progress-modal');
+        window.location.reload();
+    }
+}
+
+async function downloadImages() {
+    if (!isLoggedIn()) {
+        toggleModal('err-modal');
+        return;
+    }
+    await refreshAccessToken();
+    let fileIds = [];
+    if (currTab === 'all-images-tab') {
+        fileIds = allImageIds; // Replace with your file IDs
+    } else {
+        for (var key in faceImageIds) {
+            if (currTab === key) {
+                fileIds = faceImageIds[key];
+            }
+        }
+
+    }
+    if (!fileIds.length > 0) {
+        toggleModal('down-del-modal');
+        return
+    }
+
+    console.log("Image Downoading Start")
+    const accessToken = getAccessToken(); // Replace with your access token
+
+    const zip = new JSZip();
+
+    try {
+        let progress = 0;
+        toggleModal('progress-modal');
+        for (const fileId of fileIds) {
+            progress++;
+            document.getElementById('progress-status').innerHTML = `(${progress}/${fileIds.length})`;
+            const imageBlob = await fetchImageFromDrive(accessToken, fileId);
+            zip.file(`${fileId}.jpg`, imageBlob); // Save with file ID as the name, adjust extension if needed
+        }
+
+        // Generate the ZIP file
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+        // Create a link to download the ZIP file
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = 'images.zip'; // Name of the ZIP file
+        link.click();
+
+        // Clean up
+        URL.revokeObjectURL(link.href);
+    } catch (error) {
+        console.error('Failed to download and zip images:', error);
+    } finally {
+        toggleModal('progress-modal');
+    }
+}
+
+async function fetchImageFromDrive(accessToken, fileId) {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error fetching file ${fileId}: ${response.statusText}`);
+    }
+
+    return await response.blob();
+}
+
+async function deleteIdFromData(id, data) {
+    // Filter the data to remove the ID from imagePaths and the entire object if imagePaths is empty
+    const updatedData = data
+        .map(item => {
+            // Remove the id from imagePaths
+            item.imagePaths = item.imagePaths.filter(imagePath => imagePath !== id);
+            return item;
+        })
+        .filter(item => item.imagePaths.length > 0); // Remove objects with empty imagePaths
+
+    // Return the updated data
+    return updatedData;
 }

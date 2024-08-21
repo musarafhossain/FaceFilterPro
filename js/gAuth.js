@@ -1,6 +1,6 @@
 const CLIENT_ID = '936389827719-p29mt159u8qa0hkricvrecvtrcp9ofpl.apps.googleusercontent.com';
-//const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
-const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
+const REDIRECT_URI = 'http://127.0.0.1:5500/';//For Development
+//const REDIRECT_URI = 'https://musarafhossain.github.io/FaceFilterPro/';//For Production
 const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.profile';
 const API_KEY = 'AIzaSyCnwIHjGfkPzfjKfBvE_2pGHWOiyYqN6yM';
 
@@ -15,6 +15,7 @@ async function goLoginPage() {
 async function initializeApp() {
     if (isLoggedIn()) {
         try {
+            await refreshAccessToken();
             await initializeFolderId(); //Initialize folder IDs
             await loadImageIds(); //Load existing all images
             await updateUIForLoggedInState(); //update the ui after login
@@ -137,40 +138,39 @@ async function loadImageIds() {
     }
 }
 
-/*
-async function checkAccessToken() {
-    const accessToken = getAccessToken(); // Get the current access token
-    if (!accessToken) {
-        console.error('No access token found.');
-        await goLoginPage();
-        return;
-    }
+async function isAccessTokenExpired(accessToken) {
     try {
-        const response = await fetch('https://example.com/api/check-token', { 
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
+        // URL for Google's token info endpoint
+        const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
 
-        if (response.ok) {
-            // Token is valid
-            console.log('Access token is valid.');
-            return accessToken; // Return the valid access token
-        } else if (response.status === 401) {
-            // Token is expired or invalid
-            console.error('Access token is expired or invalid.');
-            await goLoginPage(); // Redirect to the login page if the token is invalid
-        } else {
-            // Handle other errors
-            const errorDetails = await response.json();
-            throw new Error(`Error checking access token: ${response.statusText} - ${errorDetails.message}`);
+        if (!response.ok) {
+            // Token is invalid or expired
+            return true;
         }
+
+        const tokenInfo = await response.json();
+        console.log(tokenInfo.expires_in)
+        return tokenInfo.expires_in <= 0;
+
     } catch (error) {
-        console.error(`Error checking access token: ${error.message}`);
-        await goLoginPage(); // Redirect to the login page if an error occurs
+        console.error("Error checking access token:", error);
+        return true; // Assume expired in case of an error
     }
-}*/
+}
+
+async function refreshAccessToken() {
+    // Usage example
+    const accessToken = getAccessToken();
+    isAccessTokenExpired(accessToken).then(isExpired => {
+        if (isExpired) {
+            console.log("Access token is expired.");
+            logout();
+            //toggleModal('err-modal')
+        } else {
+            console.log("Access token is still valid.");
+        }
+    });
+}
 
 //signin button add event listerner
 document.getElementById('sign-in-btn').addEventListener('click', async () => {
