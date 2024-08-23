@@ -337,13 +337,13 @@ section .image-tab .tab-container {
     color: #fff;
 }
 
-/* Fixed size for images */
 .image-class {
-    width: 140px; /* Fixed width */
-    height: 200px; /* Fixed height */
-    display: block; /* Remove extra space below images */
-    border-radius: 8px; /* Rounded corners for grid items */
-    object-fit: cover; /* Cover the grid item without stretching */
+    width: 140px; 
+    height: 200px;
+    display: block; 
+    border-radius: 8px; 
+    object-fit: cover;
+    cursor: pointer;
   }
   
   /* Style for grid items */
@@ -391,6 +391,18 @@ section .image-tab .tab-container {
     padding: 1rem 1.5rem;
     width: 24rem;
     border-radius: 0.5rem;
+}
+
+.gallery-modal-content{
+    width: 90%;
+    height: 90%;
+}
+
+.gallery-modal-content img{
+    height: 100%;
+    border-radius: 7px;
+    width: 100%;
+    object-fit: contain;
 }
 
 .modal-content p {

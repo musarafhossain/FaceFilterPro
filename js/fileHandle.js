@@ -315,6 +315,7 @@ async function getImageById(fileId) {
         const imageData = await response.json();
 
         // Return the image data
+        console.log(imageData)
         return imageData;
 
     } catch (error) {

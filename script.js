@@ -328,6 +328,10 @@ async function addImagesToTab(currTabId, imgIds) {
             const imgElement = document.createElement('img');
             imgElement.src = image.thumbnailLink || image.webViewLink;
             imgElement.alt = image.name;
+            imgElement.onclick = () => {
+                //console.log(imgElement.src);
+                toggleGalleryModal(imgElement.src);
+            }
             imgElement.classList.add('image-class');
             // Append the image element to the container
             divElement.classList.add('gallery-item');
@@ -344,6 +348,12 @@ async function addImagesToTab(currTabId, imgIds) {
 
 function toggleModal(modal) {
     document.getElementById(modal).classList.toggle("show-modal");
+}
+
+function toggleGalleryModal(src) {
+    document.getElementById('gallery-modal').classList.toggle("show-modal");
+    const img = document.getElementById('gallery-main-image');
+    img.src = src;
 }
 
 function windowOnClick(event) {
